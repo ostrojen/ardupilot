@@ -1519,6 +1519,53 @@ void AP_OSD_Screen::draw_avgcellrestvolt(uint8_t x, uint8_t y)
 {
     draw_bat_volt(0,VoltageType::RESTING_CELL,x, y);
 }
+// Finchi
+void AP_OSD_Screen::draw_plane_name()
+{
+    // Pointer to a constant string
+    const char* aircraft_name;
+
+    // Determine the plane name based on choice
+    switch (osd->finchi_plane_name_choice)
+    {
+    case 1:
+        aircraft_name = "MRIYA";  // Assign string literal to the pointer
+        break;
+    case 2:
+        aircraft_name = "M-HARON";  // Assign string literal to the pointer
+        break;
+    case 3:
+        aircraft_name = "M-GERMES";  // Assign string literal to the pointer
+        break;
+    default:
+        aircraft_name = "";  // Assign default string literal
+        break;
+    }
+
+    // Display the string on the screen using backend's write function
+    backend->write(osd->finchi_plane_name_x, osd->finchi_plane_name_y, false, "%s", aircraft_name);
+}
+
+// Finchi
+void AP_OSD_Screen::draw_iboard_state()
+{
+    if (osd->finchi_init_board_en == 0)
+        return;
+    int16_t temp_pwm = hal.rcin->read(osd->finchi_init_board_channel-1);
+
+    if (temp_pwm < 900 || temp_pwm > 2100) {
+        return;
+    }
+    const char* iboard_state;
+
+    if(temp_pwm > osd->finchi_init_board_low && temp_pwm < osd->finchi_init_board_high)
+        iboard_state = "ACT";
+    else
+        iboard_state = "DIS";
+
+    backend->write(osd->finchi_init_board_x, osd->finchi_init_board_y, false, "%s", iboard_state);
+}
+
 
 void AP_OSD_Screen::draw_restvolt(uint8_t x, uint8_t y)
 {
@@ -2542,6 +2589,8 @@ void AP_OSD_Screen::draw(void)
     if (!enabled || !backend) {
         return;
     }
+    draw_plane_name();
+    draw_iboard_state();
     //Note: draw order should be optimized.
     //Big and less important items should be drawn first,
     //so they will not overwrite more important ones.

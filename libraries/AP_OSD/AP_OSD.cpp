@@ -257,6 +257,16 @@ const AP_Param::GroupInfo AP_OSD::var_info[] = {
     // @RebootRequired: True
     AP_GROUPINFO("_TYPE2", 32, AP_OSD, osd_type2, 0),
 
+    AP_GROUPINFO("_NAME_CHOICE", 33, AP_OSD, finchi_plane_name_choice, 1),
+    AP_GROUPINFO("_NAME_X", 34, AP_OSD, finchi_plane_name_x, 23),
+    AP_GROUPINFO("_NAME_Y", 35, AP_OSD, finchi_plane_name_y, 12),
+    AP_GROUPINFO("_I_BOARD_EN", 36, AP_OSD, finchi_init_board_en, 1),
+    AP_GROUPINFO("_I_BOARD_CHAN", 37, AP_OSD, finchi_init_board_channel, 7),
+    AP_GROUPINFO("_I_BOARD_L", 38, AP_OSD, finchi_init_board_low, 1200),
+    AP_GROUPINFO("_I_BOARD_H", 39, AP_OSD, finchi_init_board_high, 2100),
+    AP_GROUPINFO("_I_BOARD_X", 40, AP_OSD, finchi_init_board_x, 2),
+    AP_GROUPINFO("_I_BOARD_Y", 41, AP_OSD, finchi_init_board_y, 9),
+
     AP_GROUPEND
 };
 

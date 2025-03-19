@@ -263,6 +263,8 @@ private:
     AP_Int8 esc_index;
 #endif
 
+    void draw_plane_name(); // Finchi
+    void draw_iboard_state(); // Finchi
     void draw_altitude(uint8_t x, uint8_t y);
     void draw_bat_volt(uint8_t instance,VoltageType  type,uint8_t x, uint8_t y);
     void draw_bat_volt(uint8_t x, uint8_t y);
@@ -560,6 +562,15 @@ public:
     AP_Int8 v_offset;
     AP_Int8 h_offset;
 
+    AP_Int8 finchi_plane_name_choice; // Finchi
+    AP_Int8 finchi_plane_name_x; // Finchi
+    AP_Int8 finchi_plane_name_y; // Finchi
+    AP_Int8 finchi_init_board_en; // Finchi
+    AP_Int8 finchi_init_board_channel; // Finchi
+    AP_Int32 finchi_init_board_low; // Finchi
+    AP_Int32 finchi_init_board_high; // Finchi
+    AP_Int8 finchi_init_board_x; // Finchi
+    AP_Int8 finchi_init_board_y; // Finchi
     AP_Int8 warn_rssi;
     AP_Int8 warn_nsat;
     AP_Int32 warn_terr;
