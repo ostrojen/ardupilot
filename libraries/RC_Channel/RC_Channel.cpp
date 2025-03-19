@@ -61,6 +61,38 @@ extern const AP_HAL::HAL& hal;
 #include <AP_Vehicle/AP_Vehicle_Type.h>
 #define SWITCH_DEBOUNCE_TIME_MS  200
 
+/**
+ * @brief 6-position switch based on MILELRS PWM input.
+ *
+ * 8 AUX [11,12,13,14 channels]
+ * AUX | PWM
+ *  0  | 999
+ *  1  | 1142
+ *  2  | 1285
+ *  3  | 1428
+ *  4  | 1571
+ *  5  | 1714
+ *  6  | 1856
+ *  7  | 2000
+
+    TODO: check double 2 and 4 instead of 1 and 5
+ * 6pos switch ranges(166 step) with 70% weight:
+ * POSITION | [START, END] | MILELRS 8AUX PWM
+ *    0     | [999,  1166] | 1142
+ *    1     | [1166, 1333] | 1285
+ *    2     | [1333, 1500] | 1428
+ *    3     | [1500, 1666] | 1571
+ *    4     | [1666, 1833] | 1714
+ *    5     | [1833, 2000] | 1856
+ *
+ * @param[out] position The detected switch position (0-5).
+ * @return true if a valid position is detected and debounced, false otherwise.
+ */
+#define WIDE_MIN_LIMIT_PWM 988
+#define WIDE_MAX_LIMIT_PWM 2012
+
+constexpr uint16_t WIDE_6POS_STEP = (WIDE_MAX_LIMIT_PWM - WIDE_MIN_LIMIT_PWM) / 6;
+
 const AP_Param::GroupInfo RC_Channel::var_info[] = {
     // @Param: MIN
     // @DisplayName: RC min PWM
@@ -550,6 +582,23 @@ void RC_Channel::reset_mode_switch()
     read_mode_switch();
 }
 
+bool RC_Channel::wide_6pos_switch(int8_t& position)
+{
+    const uint16_t pulsewidth = get_radio_in();
+    if (pulsewidth < WIDE_MIN_LIMIT_PWM || pulsewidth > WIDE_MAX_LIMIT_PWM) {
+        return false;  // This is an error condition
+    }
+
+//  [0,5]      [988-2012]    988                  166
+    position = (pulsewidth - WIDE_MIN_LIMIT_PWM) / WIDE_6POS_STEP;
+
+    if (!debounce_completed(position)) {
+        return false;
+    }
+
+    return true;
+}
+
 // read a 6 position switch
 bool RC_Channel::read_6pos_switch(int8_t& position)
 {
@@ -816,8 +865,17 @@ bool RC_Channel::read_aux()
 #if AP_VIDEOTX_ENABLED
     } else if (_option == AUX_FUNC::VTX_POWER) {
         int8_t position;
-        if (read_6pos_switch(position)) {
+        if (wide_6pos_switch(position)) {
             AP::vtx().change_power(position);
+            return true;
+        }
+        return false;
+    } else if (_option == AUX_FUNC::VTX_CHANNEL) {
+        int8_t position;
+        if (wide_6pos_switch(position)) {
+            AP::vtx().set_configured_frequency_mhz(
+                AP::vtx().get_button_frequency(position)
+            );
             return true;
         }
         return false;

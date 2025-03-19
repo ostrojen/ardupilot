@@ -403,6 +403,8 @@ private:
     bool read_3pos_switch(AuxSwitchPos &ret) const WARN_IF_UNUSED;
     bool read_6pos_switch(int8_t& position) WARN_IF_UNUSED;
 
+    bool wide_6pos_switch(int8_t& position) WARN_IF_UNUSED;
+
     // Structure used to detect and debounce switch changes
     struct {
         int8_t debounce_position = -1;
