@@ -151,6 +151,8 @@ public:
     friend class ModeTraining;
     friend class ModeAcro;
     friend class ModeFBWA;
+    friend class ModeFStable;
+    friend class ModeAttack;
     friend class ModeFBWB;
     friend class ModeCruise;
     friend class ModeAutoTune;
@@ -278,6 +280,8 @@ private:
     ModeTraining mode_training;
     ModeAcro mode_acro;
     ModeFBWA mode_fbwa;
+    ModeFStable mode_fstb;
+    ModeAttack mode_attack;
     ModeFBWB mode_fbwb;
     ModeCruise mode_cruise;
     ModeAutoTune mode_autotune;

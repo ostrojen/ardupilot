@@ -1290,6 +1290,8 @@ bool Plane::nav_scripting_enable(uint8_t mode)
        case Mode::Number::STABILIZE:
        case Mode::Number::ACRO:
        case Mode::Number::FLY_BY_WIRE_A:
+       case Mode::Number::FSTABLE:
+       case Mode::Number::ATTACK:
        case Mode::Number::FLY_BY_WIRE_B:
        case Mode::Number::CRUISE:
        case Mode::Number::LOITER:

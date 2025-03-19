@@ -6,6 +6,28 @@
  */
 
 const AP_Param::Info Plane::var_info[] = {
+    // @Param: ARM_AIR_EN
+    // @DisplayName: Enable air arming
+    // @Description: This parameter enables or disables arming the aircraft while in the air. When enabled, the aircraft can be armed without passing all arming checks if the altitude is above the specified minimum.
+    // @Values: 0:Disabled, 1:Enabled
+    // @User: Advanced
+    GSCALAR(arming_air_enable, "ARM_AIR_EN", 1),
+
+    // @Param: FSTB_FS_ENABLE
+    // @DisplayName: Enable flight stabilization failsafe
+    // @Description: This parameter enables or disables the flight stabilization failsafe. When enabled, the system will automatically engage failsafe mode if it detects a loss of stabilization.
+    // @Values: 0:Disabled, 1:Enabled
+    // @User: Advanced
+    GSCALAR(fstb_failsafe_enable, "FSTB_FS_ENABLE", 1),
+
+    // @Param: FSTB_FS_TIMEOUT
+    // @DisplayName: Flight stabilization failsafe timeout
+    // @Description: The time, in seconds, that the system waits before triggering the flight stabilization failsafe after detecting a loss of stabilization.
+    // @Range: 1 60
+    // @Units: Seconds
+    // @User: Advanced
+    GSCALAR(fstb_failsafe_timeout, "FSTB_FS_TIMEOUT", 10),
+
     // @Param: FORMAT_VERSION
     // @DisplayName: Eeprom format version number
     // @Description: This value is incremented when changes are made to the eeprom format

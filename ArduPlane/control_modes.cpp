@@ -25,6 +25,12 @@ Mode *Plane::mode_from_mode_num(const enum Mode::Number num)
     case Mode::Number::FLY_BY_WIRE_A:
         ret = &mode_fbwa;
         break;
+    case Mode::Number::FSTABLE:
+        ret = &mode_fstb;
+        break;
+    case Mode::Number::ATTACK:
+        ret = &mode_attack;
+        break;
     case Mode::Number::FLY_BY_WIRE_B:
         ret = &mode_fbwb;
         break;

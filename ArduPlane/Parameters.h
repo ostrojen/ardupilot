@@ -357,7 +357,19 @@ public:
         k_param_acro_yaw_rate,
         k_param_takeoff_throttle_max_t,
         k_param_autotune_options,
+
+        // 270: FSTB Failsafe
+        k_param_fstb_failsafe_enable = 270,  // identifier for enabling/disabling failsafe
+        k_param_fstb_failsafe_timeout,    // identifier for setting the failsafe time
+        k_param_arming_air_enable,    // identifier for enabling/disabling arming in air
+        k_param_arming_min_speed,    // identifier for setting the air arming min att
     };
+
+    AP_Int8 fstb_failsafe_enable;  // Variable to enable/disable failsafe
+    AP_Int8 fstb_failsafe_timeout; // Variable for failsafe time
+
+    AP_Int8 arming_air_enable;  // Variable to enable/disable air arming
+    AP_Int16 arming_min_speed;    // Variable for arming altitude
 
     AP_Int16 format_version;
 

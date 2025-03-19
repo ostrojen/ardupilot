@@ -54,6 +54,8 @@ public:
 #if HAL_QUADPLANE_ENABLED
         LOITER_ALT_QLAND = 25,
 #endif
+        FSTABLE = 26,
+        ATTACK = 27,
     };
 
     // Constructor
@@ -493,6 +495,48 @@ public:
     
     bool mode_allows_autotuning() const override { return true; }
 
+};
+
+class ModeFStable : public Mode
+{
+public:
+
+    Number mode_number() const override { return Number::FSTABLE; }
+    const char *name() const override { return "FLY_STABLE"; }
+    const char *name4() const override { return "FSTB"; }
+
+    // methods that affect movement of the vehicle in this mode
+    void update() override;
+
+    bool mode_allows_autotuning() const override { return true; }
+
+};
+
+class ModeAttack : public Mode
+{
+public:
+
+    Number mode_number() const override { return Number::ATTACK; }const char *name() const override { return "ATTACK"; }
+    const char *name4() const override { return "ATCK"; }
+
+    // methods that affect movement of the vehicle in this mode
+    void update() override;
+
+    void navigate() override;
+
+    bool mode_allows_autotuning() const override { return true; }
+
+protected:
+
+    bool _enter() override;
+
+    // Variable to store the target pitch angle when the stick is in neutral
+    int32_t target_pitch_angle;
+
+    // Variable to store the state and the time of heading
+    bool locked_heading;
+    uint32_t lock_timer_ms;
+    int32_t locked_heading_cd;
 };
 
 class ModeFBWB : public Mode
