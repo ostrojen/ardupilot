@@ -75,6 +75,13 @@ const AP_Param::GroupInfo AP_VideoTX::var_info[] = {
     // @Range: 25 1000
     AP_GROUPINFO("MAX_POWER", 7, AP_VideoTX, _max_power_mw, 800),
 
+    AP_GROUPINFO("BUTTON_1", 8, AP_VideoTX, _frequency_buttons[0], 5865),
+    AP_GROUPINFO("BUTTON_2", 9, AP_VideoTX, _frequency_buttons[1], 5733),
+    AP_GROUPINFO("BUTTON_3", 10, AP_VideoTX, _frequency_buttons[2], 5705),
+    AP_GROUPINFO("BUTTON_4", 11, AP_VideoTX, _frequency_buttons[3], 5740),
+    AP_GROUPINFO("BUTTON_5", 12, AP_VideoTX, _frequency_buttons[4], 5845),
+    AP_GROUPINFO("BUTTON_6", 13, AP_VideoTX, _frequency_buttons[5], 5800),
+
     AP_GROUPEND
 };
 

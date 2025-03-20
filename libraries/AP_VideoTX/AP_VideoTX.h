@@ -135,6 +135,8 @@ public:
     uint8_t get_configured_band() const { return _band; }
     uint8_t get_band() const { return _current_band; }
     bool update_band() const { return _defaults_set && _band != _current_band; }
+    // get / set the frequency band
+    uint16_t get_button_frequency(uint8_t button) const { return _frequency_buttons[button]; }
     // get / set the frequency channel
     void set_channel(uint8_t channel) { _current_channel = channel; }
     void set_configured_channel(uint8_t channel) { _channel.set_and_save_ifchanged(channel); }
@@ -190,6 +192,9 @@ private:
     // frequency band
     AP_Int8 _band;
     uint16_t _current_band;
+
+    // frequency buttons
+    AP_Int16 _frequency_buttons[6];
 
     // frequency channel
     AP_Int8 _channel;
