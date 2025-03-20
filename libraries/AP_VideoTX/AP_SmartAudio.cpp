@@ -24,7 +24,7 @@
 #if AP_SMARTAUDIO_ENABLED
 
 #ifdef SA_DEBUG
-# define debug(fmt, args...)	do { hal.console->printf("SA: " fmt "\n", ##args); } while (0)
+# define debug(fmt, args...)	do { GCS_SEND_TEXT(MAV_SEVERITY_INFO, "SA: " fmt "\n", ##args); } while (0)
 #else
 # define debug(fmt, args...)	do {} while(0)
 #endif

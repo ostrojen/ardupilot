@@ -87,7 +87,7 @@ const AP_Param::GroupInfo AP_VideoTX::var_info[] = {
 
 //#define VTX_DEBUG
 #ifdef VTX_DEBUG
-# define debug(fmt, args...)	hal.console->printf("VTX: " fmt "\n", ##args)
+# define debug(fmt, args...)	GCS_SEND_TEXT(MAV_SEVERITY_INFO, "VTX: " fmt "\n", ##args)
 #else
 # define debug(fmt, args...)	do {} while(0)
 #endif
