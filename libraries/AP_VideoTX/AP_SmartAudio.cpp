@@ -232,13 +232,11 @@ void AP_SmartAudio::update_vtx_params()
             case SMARTAUDIO_SPEC_PROTOCOL_v2:
                 set_power(vtx.get_configured_power_level());
                 break;
-            default:    // v1
-                switch(vtx.get_configured_power_level()) {
-                    case 1: set_power(16); break; // 200mw
-                    case 2: set_power(25); break; // 500mw
-                    case 3: set_power(40); break; // 800mw
-                    default: set_power(7); break; // 25mw
-                }
+            case SMARTAUDIO_SPEC_PROTOCOL_v1:
+                set_power(vtx.get_configured_power_dac());
+                break;
+            default:
+                AP_HAL::panic("Unknown SmartAudio protocol version %d", _protocol_version);
                 break;
             }
         }
@@ -519,11 +517,6 @@ void AP_SmartAudio::update_vtx_settings(const Settings& settings)
         vtx.set_power_dbm(settings.power_in_dbm);
         // learn them all
         vtx.update_all_power_dbm(settings.num_power_levels, settings.power_levels);
-    } else if (settings.version == SMARTAUDIO_SPEC_PROTOCOL_v2) {
-        vtx.set_power_level(settings.power, AP_VideoTX::PowerActive::Active);
-        // learn them all - it's not possible to know the mw values in v2.0 so just have to go from the spec
-        uint8_t power[] { 0, 14, 23, 27, 29 };
-        vtx.update_all_power_dbm(5, power);
     } else {
         vtx.set_power_level(settings.power, AP_VideoTX::PowerActive::Active);
     }
@@ -625,12 +618,15 @@ bool  AP_SmartAudio::parse_response_buffer(const uint8_t *buffer)
             vtx.set_power_level(power);
             vtx.set_configured_power_mw(vtx.get_power_mw());
             break;
-        default:
+        case SMARTAUDIO_SPEC_PROTOCOL_v1:
             if (vtx.get_configured_power_dac() != power) {
                 vtx.update_power_dbm(vtx.get_configured_power_dbm(), AP_VideoTX::PowerActive::Inactive);
             }
             vtx.set_power_dac(power);
             vtx.set_configured_power_mw(vtx.get_power_mw());
+            break;
+        default:
+            AP_HAL::panic("Unknown SmartAudio protocol version %d", _protocol_version);
             break;
         }
         debug("Power was set to %d", power);

@@ -21,7 +21,7 @@
 #include <AP_Param/AP_Param.h>
 
 #define VTX_MAX_CHANNELS 8
-#define VTX_MAX_POWER_LEVELS 10
+#define VTX_MAX_POWER_LEVELS 5
 
 class AP_VideoTX {
 public:
@@ -81,14 +81,14 @@ public:
     };
 
     struct PowerLevel {
-        uint8_t level;
-        uint16_t mw;
-        uint8_t dbm;
-        uint8_t dac; // SmartAudio v1 dac value
+        AP_Int8 level;
+        AP_Int16 mw;
+        AP_Int8 dbm;
+        AP_Int8 dac; // SmartAudio v1 dac value
         PowerActive active;
     };
 
-    static PowerLevel _power_levels[VTX_MAX_POWER_LEVELS];
+    PowerLevel _power_levels[VTX_MAX_POWER_LEVELS];
 
     static const uint16_t VIDEO_CHANNELS[MAX_BANDS][VTX_MAX_CHANNELS];
 
@@ -111,19 +111,19 @@ public:
     void update_all_power_dbm(uint8_t nlevels, const uint8_t levels[]);
     void set_configured_power_mw(uint16_t power);
     uint16_t get_configured_power_mw() const { return _power_mw; }
-    uint16_t get_power_mw() const { return _power_levels[_current_power].mw; }
+    uint16_t get_power_mw() const { return _power_levels[_current_power].mw.get(); }
 
     // get the power in dbm, rounding appropriately
     uint8_t get_configured_power_dbm() const {
-        return _power_levels[find_current_power()].dbm;
+        return _power_levels[find_current_power()].dbm.get();
     }
     // get the power "level"
     uint8_t get_configured_power_level() const {
-        return _power_levels[find_current_power()].level & 0xF;
+        return _power_levels[find_current_power()].level.get();
     }
     // get the power "dac"
     uint8_t get_configured_power_dac() const {
-        return _power_levels[find_current_power()].dac;
+        return _power_levels[find_current_power()].dac.get();
     }
 
     bool update_power() const;

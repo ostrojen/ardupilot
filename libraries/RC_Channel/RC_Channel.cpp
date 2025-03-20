@@ -88,10 +88,11 @@ extern const AP_HAL::HAL& hal;
  * @param[out] position The detected switch position (0-5).
  * @return true if a valid position is detected and debounced, false otherwise.
  */
-#define WIDE_MIN_LIMIT_PWM 988
-#define WIDE_MAX_LIMIT_PWM 2012
+#define WIDE_MIN_LIMIT_PWM 900
+#define WIDE_MAX_LIMIT_PWM 2100
 
 constexpr uint16_t WIDE_6POS_STEP = (WIDE_MAX_LIMIT_PWM - WIDE_MIN_LIMIT_PWM) / 6;
+constexpr uint16_t WIDE_5POS_STEP = (WIDE_MAX_LIMIT_PWM - WIDE_MIN_LIMIT_PWM) / 5;
 
 const AP_Param::GroupInfo RC_Channel::var_info[] = {
     // @Param: MIN
@@ -589,8 +590,25 @@ bool RC_Channel::wide_6pos_switch(int8_t& position)
         return false;  // This is an error condition
     }
 
-//  [0,5]      [988-2012]    988                  166
+//  [0,5]      [900-2100]    900                  200
     position = (pulsewidth - WIDE_MIN_LIMIT_PWM) / WIDE_6POS_STEP;
+
+    if (!debounce_completed(position)) {
+        return false;
+    }
+
+    return true;
+}
+
+bool RC_Channel::wide_5pos_switch(int8_t& position)
+{
+    const uint16_t pulsewidth = get_radio_in();
+    if (pulsewidth < WIDE_MIN_LIMIT_PWM || pulsewidth > WIDE_MAX_LIMIT_PWM) {
+        return false;  // This is an error condition
+    }
+
+//  [0,4]      [900-2100]    900                  240
+    position = (pulsewidth - WIDE_MIN_LIMIT_PWM) / WIDE_5POS_STEP;
 
     if (!debounce_completed(position)) {
         return false;
@@ -866,7 +884,7 @@ bool RC_Channel::read_aux()
 #if AP_VIDEOTX_ENABLED
     } else if (_option == AUX_FUNC::VTX_POWER) {
         int8_t position;
-        if (wide_6pos_switch(position)) {
+        if (wide_5pos_switch(position)) {
             AP::vtx().change_power(position);
             return true;
         }
