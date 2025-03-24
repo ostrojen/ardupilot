@@ -59,7 +59,7 @@
 #define SMARTAUDIO_RSP_SET_FREQUENCY    SMARTAUDIO_CMD_SET_FREQUENCY >> 1
 #define SMARTAUDIO_RSP_SET_MODE         SMARTAUDIO_CMD_SET_MODE >> 1
 
-#define SMARTAUDIO_BANDCHAN_TO_INDEX(band, channel) (band * VTX_MAX_CHANNELS + (channel))
+#define SMARTAUDIO_BANDCHAN_TO_INDEX(band, channel) (band * VTX_MODEL_CHANNELS + (channel))
 
 //#define SA_DEBUG
 

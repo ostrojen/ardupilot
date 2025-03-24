@@ -19,8 +19,9 @@
 #if AP_VIDEOTX_ENABLED
 
 #include <AP_Param/AP_Param.h>
+#include "models/VTX_Model.h"
 
-#define VTX_MAX_CHANNELS 8
+#define FREQUENCY_BUTTON_NUMBER 6
 #define VTX_MAX_POWER_LEVELS 5
 
 class AP_VideoTX {
@@ -53,8 +54,6 @@ public:
         VTX_CRSF_IGNORE_STAT  = (1 << 7),
     };
 
-    static const char *band_names[];
-
     enum VideoBand {
         BAND_A,
         BAND_B,
@@ -62,10 +61,7 @@ public:
         FATSHARK,
         RACEBAND,
         LOW_RACEBAND,
-        BAND_1G3_A,
-        BAND_1G3_B,
-        BAND_X,
-        MAX_BANDS
+        BAND_X
     };
 
     enum class PowerActive {
@@ -90,10 +86,8 @@ public:
 
     PowerLevel _power_levels[VTX_MAX_POWER_LEVELS];
 
-    static const uint16_t VIDEO_CHANNELS[MAX_BANDS][VTX_MAX_CHANNELS];
-
-    static uint16_t get_frequency_mhz(uint8_t band, uint8_t channel) { return VIDEO_CHANNELS[band][channel]; }
-    static bool get_band_and_channel(uint16_t freq, VideoBand& band, uint8_t& channel);
+    uint16_t get_table_frequency_mhz(uint8_t band, uint8_t channel);
+    bool get_band_and_channel(uint16_t freq, VideoBand& band, uint8_t& channel);
 
     void set_frequency_mhz(uint16_t freq) { _current_frequency = freq; }
     void set_configured_frequency_mhz(uint16_t freq) { _frequency_mhz.set_and_save_ifchanged(freq); }
@@ -128,7 +122,7 @@ public:
 
     bool update_power() const;
     // change the video power based on switch input
-    void change_power(int8_t position);
+    void change_power(uint8_t position);
     // get / set the frequency band
     void set_band(uint8_t band) { _current_band = band; }
     void set_configured_band(uint8_t band) { _band.set_and_save_ifchanged(band); }
@@ -194,7 +188,10 @@ private:
     uint16_t _current_band;
 
     // frequency buttons
-    AP_Int16 _frequency_buttons[6];
+    AP_Int16 _frequency_buttons[FREQUENCY_BUTTON_NUMBER];
+
+    AP_Int8 _model_id;
+    VTX_Model* _model;
 
     // frequency channel
     AP_Int8 _channel;

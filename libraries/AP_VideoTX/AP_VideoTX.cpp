@@ -16,11 +16,13 @@
 #include "AP_VideoTX.h"
 
 #if AP_VIDEOTX_ENABLED
+#include <map>
 
 #include <AP_RCTelemetry/AP_CRSF_Telem.h>
 #include <GCS_MAVLink/GCS.h>
 
 #include <AP_HAL/AP_HAL.h>
+#include "models/Factory.cpp"
 
 extern const AP_HAL::HAL& hal;
 
@@ -107,6 +109,13 @@ const AP_Param::GroupInfo AP_VideoTX::var_info[] = {
     AP_GROUPINFO("POWER_5DBM", 32, AP_VideoTX, _power_levels[4].dbm, 37),
     AP_GROUPINFO("POWER_5DAC", 33, AP_VideoTX, _power_levels[4].dac, 40),
 
+    // @Param: MODEL
+    // @DisplayName: Video Transmitter Model
+    // @Description: Video Transmitter Model
+    // @User: Advanced
+    // @Values: 0:AKK Ranger 3W,1:AKK Ranger 3W LX,2:AKK Ranger 3W LX,3:AKK Alpha 5W
+    AP_GROUPINFO("MODEL_ID", 34, AP_VideoTX, _model_id, 3),
+
     AP_GROUPEND
 };
 
@@ -119,21 +128,6 @@ const AP_Param::GroupInfo AP_VideoTX::var_info[] = {
 
 extern const AP_HAL::HAL& hal;
 
-const char * AP_VideoTX::band_names[] = {"A","B","E","F","R","L","1G3_A","1G3_B","X"};
-
-const uint16_t AP_VideoTX::VIDEO_CHANNELS[AP_VideoTX::MAX_BANDS][VTX_MAX_CHANNELS] =
-{
-    { 5865, 5845, 5825, 5805, 5785, 5765, 5745, 5725}, /* Band A */
-    { 5733, 5752, 5771, 5790, 5809, 5828, 5847, 5866}, /* Band B */
-    { 5705, 5685, 5665, 5645, 5885, 5905, 5925, 5945}, /* Band E */
-    { 5740, 5760, 5780, 5800, 5820, 5840, 5860, 5880}, /* Airwave */
-    { 5658, 5695, 5732, 5769, 5806, 5843, 5880, 5917}, /* Race */
-    { 5621, 5584, 5547, 5510, 5473, 5436, 5399, 5362}, /* LO Race */
-    { 1080, 1120, 1160, 1200, 1240, 1280, 1320, 1360}, /* Band 1G3_A */
-    { 1080, 1120, 1160, 1200, 1258, 1280, 1320, 1360}, /* Band 1G3_B */
-    { 4990, 5020, 5050, 5080, 5110, 5140, 5170, 5200}  /* Band X */
-};
-
 AP_VideoTX::AP_VideoTX()
 {
     if (singleton) {
@@ -143,6 +137,39 @@ AP_VideoTX::AP_VideoTX()
     singleton = this;
 
     AP_Param::setup_object_defaults(this, var_info);
+
+    _model = Factory::by_model_id_param(_model_id);
+ //   _max_power_mw.set_and_save(_model->max_power());
+/*
+    std::map<uint16_t, bool> _button_frequency_check;
+
+    for (uint8_t button_number = 0; button_number < FREQUENCY_BUTTON_NUMBER; button_number++) {
+    	_button_frequency_check[button_number] = false;
+    }
+
+    for (uint8_t i = 0; i < _model::VTX_MODEL_BANDS; i++) {
+        for (uint8_t j = 0; j < _model::VTX_MODEL_CHANNELS; j++) {
+            VIDEO_CHANNELS[i][j] = _model->getVideoChannels()[i][j];
+
+    		for (uint8_t button_number = 0; button_number < FREQUENCY_BUTTON_NUMBER; button_number++) {
+           		if (_model->frequency_table()[i][j] == _frequency_buttons[button_number].get()) {
+                	_button_frequency_check[button_number] = true;
+                }
+    		}
+        }
+    }
+
+    for (uint8_t button_number = 0; button_number < FREQUENCY_BUTTON_NUMBER; button_number++) {
+    	if(_button_frequency_check[button_number] == false) {
+          	GCS_SEND_TEXT(
+              MAV_SEVERITY_INFO,
+              "VTX: unsupport frequency(%d) in param BUTTON_%d",
+              _button_frequency_check[button_number],
+              button_number
+            );
+			//AP_HAL::panic("Params error");
+        }
+    }*/
 }
 
 AP_VideoTX::~AP_VideoTX(void)
@@ -172,11 +199,15 @@ bool AP_VideoTX::init(void)
     return true;
 }
 
+uint16_t AP_VideoTX::get_table_frequency_mhz(uint8_t band, uint8_t channel) {
+    return _model->getVideoChannels()[band][channel];
+}
+
 bool AP_VideoTX::get_band_and_channel(uint16_t freq, VideoBand& band, uint8_t& channel)
 {
-    for (uint8_t i = 0; i < AP_VideoTX::MAX_BANDS; i++) {
-        for (uint8_t j = 0; j < VTX_MAX_CHANNELS; j++) {
-            if (VIDEO_CHANNELS[i][j] == freq) {
+    for (uint8_t i = 0; i < VTX_MODEL_BANDS; i++) {
+        for (uint8_t j = 0; j < VTX_MODEL_CHANNELS; j++) {
+            if (_model->getVideoChannels()[i][j] == freq) {
                 band = VideoBand(i);
                 channel = j;
                 return true;
@@ -421,7 +452,7 @@ bool AP_VideoTX::have_params_changed() const
 // update the configured frequency to match the channel and band
 void AP_VideoTX::update_configured_frequency()
 {
-    _frequency_mhz.set_and_save(get_frequency_mhz(_band, _channel));
+    _frequency_mhz.set_and_save(get_table_frequency_mhz(_band, _channel));
 }
 
 // update the configured channel and band to match the frequency
@@ -447,7 +478,7 @@ bool AP_VideoTX::set_defaults()
 
     // check that our current view of frequency matches band/channel
     // if not then force one to be correct
-    uint16_t calced_freq = get_frequency_mhz(_current_band, _current_channel);
+    uint16_t calced_freq = get_table_frequency_mhz(_current_band, _current_channel);
     if (_current_frequency != calced_freq) {
         if (_current_frequency > 0) {
             VideoBand band;
@@ -480,7 +511,7 @@ bool AP_VideoTX::set_defaults()
     }
 
     // Now check that the user didn't screw up by selecting incompatible options
-    if (_frequency_mhz != get_frequency_mhz(_band, _channel)) {
+    if (_frequency_mhz != get_table_frequency_mhz(_band, _channel)) {
         if (_frequency_mhz > 0) {
             update_configured_channel_and_band();
         } else {
@@ -498,16 +529,21 @@ bool AP_VideoTX::set_defaults()
 void AP_VideoTX::announce_vtx_settings() const
 {
     // Output a friendly message so the user knows the VTX has been detected
-    GCS_SEND_TEXT(MAV_SEVERITY_INFO, "VTX: %s%d %dMHz, PWR: %dmW",
-        band_names[_band.get()], _channel.get() + 1, _frequency_mhz.get(),
-        has_option(VideoOptions::VTX_PITMODE) ? 0 : _power_mw.get());
+    GCS_SEND_TEXT(
+        MAV_SEVERITY_INFO,
+        "VTX: %s%d %dMHz, PWR: %dmW",
+        _model->getBandNames()[_band.get()],
+        _channel.get() + 1,
+        _frequency_mhz.get(),
+        has_option(VideoOptions::VTX_PITMODE) ? 0 : _power_mw.get()
+    );
 }
 
 // change the video power based on switch input
 // 6-pos range is in the middle of the available range
-void AP_VideoTX::change_power(int8_t position)
+void AP_VideoTX::change_power(uint8_t position)
 {
-    if (!_enabled || position < 0 || position > VTX_MAX_POWER_LEVELS) {
+    if (!_enabled || position > VTX_MAX_POWER_LEVELS) {
         GCS_SEND_TEXT(MAV_SEVERITY_INFO, "VTX: Invalid power position: %d", position);
         return;
     }
