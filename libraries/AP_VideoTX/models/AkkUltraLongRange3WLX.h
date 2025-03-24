@@ -1,13 +1,26 @@
-#include "AkkUltraLongRange3WLX.h"
+#pragma once
+#include "VTX_Model.h"
 
-const char* AkkUltraLongRange3WLX::band_names[VTX_MODEL_BANDS] =  {"A","B","E","F","L","X"};
+class AkkUltraLongRange3WLX : public VTX_Model {
+public:
+    static PowerLevel power_levels[VTX_MAX_POWER_LEVELS];
+    static const uint16_t max_power;
+    static const char* band_names[VTX_MODEL_BANDS];
+    static const uint16_t VIDEO_CHANNELS[VTX_MODEL_BANDS][VTX_MODEL_CHANNELS];
 
-const uint16_t AkkUltraLongRange3WLX::VIDEO_CHANNELS[VTX_MODEL_BANDS][VTX_MODEL_CHANNELS] = {
-    /* Band A */{ 5865, 5845, 5825, 5805, 5785, 5765, 5745, 5725},
-    /* Band b */{ 5733, 5752, 5771, 5790, 5809, 5828, 5847, 5866},
-    /* Band E */{ 5705, 5685, 5665, 5645, 5885, 5905, 5925, 5945},
-    /* Band F */{ 5740, 5760, 5780, 5800, 5820, 5840, 5860, 5880},
-    /* Band L */{ 5362, 5399, 5436, 5473, 5510, 5547, 5584, 5621},
-    /* Band X */{ 4990, 5020, 5050, 5080, 5110, 5140, 5170, 5200},
+    PowerLevel (&getPowerLevels() override)[VTX_MAX_POWER_LEVELS] {
+        return power_levels;
+    }
+
+    uint16_t getMaxPower() const override {
+        return max_power;
+    }
+
+    const char* (&getBandNames() const override)[VTX_MODEL_BANDS] {
+        return band_names;
+    }
+
+    const uint16_t (&getVideoChannels() const override)[VTX_MODEL_BANDS][VTX_MODEL_CHANNELS] {
+        return VIDEO_CHANNELS;
+    }
 };
-const uint16_t AkkUltraLongRange3WLX::max_power = 3000;

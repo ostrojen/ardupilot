@@ -16,7 +16,6 @@
 #include "AP_VideoTX.h"
 
 #if AP_VIDEOTX_ENABLED
-#include <map>
 
 #include <AP_RCTelemetry/AP_CRSF_Telem.h>
 #include <GCS_MAVLink/GCS.h>
@@ -84,37 +83,12 @@ const AP_Param::GroupInfo AP_VideoTX::var_info[] = {
     AP_GROUPINFO("BUTTON_5", 12, AP_VideoTX, _frequency_buttons[4], 5845),
     AP_GROUPINFO("BUTTON_6", 13, AP_VideoTX, _frequency_buttons[5], 5800),
 
-    AP_GROUPINFO("POWER_1LVL", 14, AP_VideoTX, _power_levels[0].level, 0),
-    AP_GROUPINFO("POWER_1MW", 15, AP_VideoTX, _power_levels[0].mw, 25),
-    AP_GROUPINFO("POWER_1DBM", 16, AP_VideoTX, _power_levels[0].dbm, 14),
-    AP_GROUPINFO("POWER_1DAC", 17, AP_VideoTX, _power_levels[0].dac, 7),
-
-    AP_GROUPINFO("POWER_2LVL", 18, AP_VideoTX, _power_levels[1].level, 1),
-    AP_GROUPINFO("POWER_2MW", 19, AP_VideoTX, _power_levels[1].mw, 1000),
-    AP_GROUPINFO("POWER_2DBM", 20, AP_VideoTX, _power_levels[1].dbm, 30),
-    AP_GROUPINFO("POWER_2DAC", 21, AP_VideoTX, _power_levels[1].dac, 22),
-
-    AP_GROUPINFO("POWER_3LVL", 22, AP_VideoTX, _power_levels[2].level, 2),
-    AP_GROUPINFO("POWER_3MW", 23, AP_VideoTX, _power_levels[2].mw, 2000),
-    AP_GROUPINFO("POWER_3DBM", 24, AP_VideoTX, _power_levels[2].dbm, 33),
-    AP_GROUPINFO("POWER_3DAC", 25, AP_VideoTX, _power_levels[2].dac, 25),
-
-    AP_GROUPINFO("POWER_4LVL", 26, AP_VideoTX, _power_levels[3].level, 3),
-    AP_GROUPINFO("POWER_4MW", 27, AP_VideoTX, _power_levels[3].mw, 3000),
-    AP_GROUPINFO("POWER_4DBM", 28, AP_VideoTX, _power_levels[3].dbm, 35),
-    AP_GROUPINFO("POWER_4DAC", 29, AP_VideoTX, _power_levels[3].dac, 32),
-
-    AP_GROUPINFO("POWER_5LVL", 30, AP_VideoTX, _power_levels[4].level, 4),
-    AP_GROUPINFO("POWER_5MW", 31, AP_VideoTX, _power_levels[4].mw, 5000),
-    AP_GROUPINFO("POWER_5DBM", 32, AP_VideoTX, _power_levels[4].dbm, 37),
-    AP_GROUPINFO("POWER_5DAC", 33, AP_VideoTX, _power_levels[4].dac, 40),
-
     // @Param: MODEL
     // @DisplayName: Video Transmitter Model
     // @Description: Video Transmitter Model
     // @User: Advanced
     // @Values: 0:AKK Ranger 3W,1:AKK Ranger 3W LX,2:AKK Ranger 3W LX,3:AKK Alpha 5W
-    AP_GROUPINFO("MODEL_ID", 34, AP_VideoTX, _model_id, 3),
+    AP_GROUPINFO("MODEL_ID", 14, AP_VideoTX, _model_id, 3),
 
     AP_GROUPEND
 };
@@ -139,37 +113,6 @@ AP_VideoTX::AP_VideoTX()
     AP_Param::setup_object_defaults(this, var_info);
 
     _model = Factory::by_model_id_param(_model_id);
- //   _max_power_mw.set_and_save(_model->max_power());
-/*
-    std::map<uint16_t, bool> _button_frequency_check;
-
-    for (uint8_t button_number = 0; button_number < FREQUENCY_BUTTON_NUMBER; button_number++) {
-    	_button_frequency_check[button_number] = false;
-    }
-
-    for (uint8_t i = 0; i < _model::VTX_MODEL_BANDS; i++) {
-        for (uint8_t j = 0; j < _model::VTX_MODEL_CHANNELS; j++) {
-            VIDEO_CHANNELS[i][j] = _model->getVideoChannels()[i][j];
-
-    		for (uint8_t button_number = 0; button_number < FREQUENCY_BUTTON_NUMBER; button_number++) {
-           		if (_model->frequency_table()[i][j] == _frequency_buttons[button_number].get()) {
-                	_button_frequency_check[button_number] = true;
-                }
-    		}
-        }
-    }
-
-    for (uint8_t button_number = 0; button_number < FREQUENCY_BUTTON_NUMBER; button_number++) {
-    	if(_button_frequency_check[button_number] == false) {
-          	GCS_SEND_TEXT(
-              MAV_SEVERITY_INFO,
-              "VTX: unsupport frequency(%d) in param BUTTON_%d",
-              _button_frequency_check[button_number],
-              button_number
-            );
-			//AP_HAL::panic("Params error");
-        }
-    }*/
 }
 
 AP_VideoTX::~AP_VideoTX(void)
@@ -226,7 +169,7 @@ void AP_VideoTX::set_configured_power_mw(uint16_t power)
 uint8_t AP_VideoTX::find_current_power() const
 {
     for (uint8_t i = 0; i < VTX_MAX_POWER_LEVELS; i++) {
-        if (_power_mw == _power_levels[i].mw) {
+        if (_power_mw == _model->getPowerLevels()[i].mw) {
             return i;
         }
     }
@@ -236,29 +179,29 @@ uint8_t AP_VideoTX::find_current_power() const
 // set the power in dbm, rounding appropriately
 void AP_VideoTX::set_power_dbm(uint8_t power, PowerActive active)
 {
-    if (power == _power_levels[_current_power].dbm.get()
-        && _power_levels[_current_power].active == active) {
+    if (power == _model->getPowerLevels()[_current_power].dbm
+        && _model->getPowerLevels()[_current_power].active == active) {
         return;
     }
 
     for (uint8_t i = 0; i < VTX_MAX_POWER_LEVELS; i++) {
-        if (power == _power_levels[i].dbm.get()) {
+        if (power == _model->getPowerLevels()[i].dbm) {
             _current_power = i;
-            _power_levels[i].active = active;
+            _model->getPowerLevels()[i].active = active;
             debug("learned power %ddbm", power);
             // now unlearn the "other" power level since we have no other way of guessing
             // the supported levels
-            if ((_power_levels[i].level.get() & 0xF0) == 0x10) {
-                _power_levels[i].level.set(_power_levels[i].level & 0xF);
+            if ((_model->getPowerLevels()[i].level & 0xF0) == 0x10) {
+                _model->getPowerLevels()[i].level = _model->getPowerLevels()[i].level & 0xF;
             }
-            if (i > 0 && _power_levels[i-1].level.get() == _power_levels[i].level.get()) {
-                debug("invalidated power %dwm, level %d is now %dmw", _power_levels[i-1].mw.get(), _power_levels[i].level.get(), _power_levels[i].mw.get());
-                _power_levels[i-1].level.set(0xFF);
-                _power_levels[i-1].active = PowerActive::Inactive;
-            } else if (i < VTX_MAX_POWER_LEVELS-1 && _power_levels[i+1].level.get() == _power_levels[i].level.get()) {
-                debug("invalidated power %dwm, level %d is now %dmw", _power_levels[i+1].mw.get(), _power_levels[i].level.get(), _power_levels[i].mw.get());
-                _power_levels[i+1].level.set(0xFF);
-                _power_levels[i+1].active = PowerActive::Inactive;
+            if (i > 0 && _model->getPowerLevels()[i-1].level == _model->getPowerLevels()[i].level) {
+                debug("invalidated power %dwm, level %d is now %dmw", _model->getPowerLevels()[i-1].mw, _model->getPowerLevels()[i].level, _model->getPowerLevels()[i].mw);
+                _model->getPowerLevels()[i-1].level = 0;
+                _model->getPowerLevels()[i-1].active = PowerActive::Inactive;
+            } else if (i < VTX_MAX_POWER_LEVELS-1 && _model->getPowerLevels()[i+1].level == _model->getPowerLevels()[i].level) {
+                debug("invalidated power %dwm, level %d is now %dmw", _model->getPowerLevels()[i+1].mw, _model->getPowerLevels()[i].level, _model->getPowerLevels()[i].mw);
+                _model->getPowerLevels()[i+1].level = 0;
+                _model->getPowerLevels()[i+1].active = PowerActive::Inactive;
             }
             return;
         }
@@ -271,21 +214,21 @@ void AP_VideoTX::set_power_dbm(uint8_t power, PowerActive active)
 uint8_t AP_VideoTX::update_power_dbm(uint8_t power, PowerActive active)
 {
     for (uint8_t i = 0; i < VTX_MAX_POWER_LEVELS; i++) {
-        if (power == _power_levels[i].dbm.get()) {
-            if (_power_levels[i].active != active) {
-                _power_levels[i].active = active;
+        if (power == _model->getPowerLevels()[i].dbm) {
+            if (_model->getPowerLevels()[i].active != active) {
+                _model->getPowerLevels()[i].active = active;
                 debug("%s power %ddbm", active == PowerActive::Active ? "learned" : "invalidated", power);
             }
             return i;
         }
     }
     // handed a non-standard value, use the last slot
-    _power_levels[VTX_MAX_POWER_LEVELS-1].dbm.set(power);
-    _power_levels[VTX_MAX_POWER_LEVELS-1].level.set(255);
-    _power_levels[VTX_MAX_POWER_LEVELS-1].dac.set(255);
-    _power_levels[VTX_MAX_POWER_LEVELS-1].mw.set(uint16_t(roundf(powf(10, power / 10.0f))));
-    _power_levels[VTX_MAX_POWER_LEVELS-1].active = active;
-    debug("non-standard power %ddbm -> %dmw", power, _power_levels[VTX_MAX_POWER_LEVELS-1].mw.get());
+    _model->getPowerLevels()[VTX_MAX_POWER_LEVELS-1].dbm = power;
+    _model->getPowerLevels()[VTX_MAX_POWER_LEVELS-1].level = 255;
+    _model->getPowerLevels()[VTX_MAX_POWER_LEVELS-1].dac = 255;
+    _model->getPowerLevels()[VTX_MAX_POWER_LEVELS-1].mw = uint16_t(roundf(powf(10, power / 10.0f)));
+    _model->getPowerLevels()[VTX_MAX_POWER_LEVELS-1].active = active;
+    debug("non-standard power %ddbm -> %dmw", power, _model->getPowerLevels()[VTX_MAX_POWER_LEVELS-1].mw);
     return VTX_MAX_POWER_LEVELS-1;
 }
 
@@ -297,8 +240,8 @@ void AP_VideoTX::update_all_power_dbm(uint8_t nlevels, const uint8_t power[])
     }
     // invalidate the remaining ones
     for (uint8_t i = 0; i < VTX_MAX_POWER_LEVELS; i++) {
-        if (_power_levels[i].active == PowerActive::Unknown) {
-            _power_levels[i].active = PowerActive::Inactive;
+        if (_model->getPowerLevels()[i].active == PowerActive::Unknown) {
+            _model->getPowerLevels()[i].active = PowerActive::Inactive;
         }
     }
 }
@@ -307,7 +250,7 @@ void AP_VideoTX::update_all_power_dbm(uint8_t nlevels, const uint8_t power[])
 void AP_VideoTX::set_power_mw(uint16_t power)
 {
     for (uint8_t i = 0; i < VTX_MAX_POWER_LEVELS; i++) {
-        if (power == _power_levels[i].mw.get()) {
+        if (power == _model->getPowerLevels()[i].mw) {
             _current_power = i;
             break;
         }
@@ -317,15 +260,15 @@ void AP_VideoTX::set_power_mw(uint16_t power)
 // set the power "level"
 void AP_VideoTX::set_power_level(uint8_t level, PowerActive active)
 {
-    if (level == _power_levels[_current_power].level.get()
-        && _power_levels[_current_power].active == active) {
+    if (level == _model->getPowerLevels()[_current_power].level
+        && _model->getPowerLevels()[_current_power].active == active) {
         return;
     }
 
     for (uint8_t i = 0; i < VTX_MAX_POWER_LEVELS; i++) {
-        if (level == _power_levels[i].level.get()) {
+        if (level == _model->getPowerLevels()[i].level) {
             _current_power = i;
-            _power_levels[i].active = active;
+            _model->getPowerLevels()[i].active = active;
             debug("learned power level %d: %dmw", level, get_power_mw());
             break;
         }
@@ -335,15 +278,15 @@ void AP_VideoTX::set_power_level(uint8_t level, PowerActive active)
 // set the power dac
 void AP_VideoTX::set_power_dac(uint16_t power, PowerActive active)
 {
-    if (power == _power_levels[_current_power].dac.get()
-        && _power_levels[_current_power].active == active) {
+    if (power == _model->getPowerLevels()[_current_power].dac
+        && _model->getPowerLevels()[_current_power].active == active) {
         return;
     }
 
     for (uint8_t i = 0; i < VTX_MAX_POWER_LEVELS; i++) {
-        if (power == _power_levels[i].dac.get()) {
+        if (power == _model->getPowerLevels()[i].dac) {
             _current_power = i;
-            _power_levels[i].active = active;
+            _model->getPowerLevels()[i].active = active;
             debug("learned power %dmw", get_power_mw());
         }
     }
@@ -389,7 +332,7 @@ void AP_VideoTX::update(void)
     // check that the requested power is actually allowed
     // reset if not
     if (_power_mw != get_power_mw()) {
-        if (_power_levels[find_current_power()].active == PowerActive::Inactive) {
+        if (_model->getPowerLevels()[find_current_power()].active == PowerActive::Inactive) {
             // reset to something we know works
             debug("power reset to %dmw from %dmw", get_power_mw(), _power_mw.get());
             _power_mw.set_and_save(get_power_mw());
@@ -430,8 +373,8 @@ bool AP_VideoTX::update_power() const {
     }
     // check that the requested power is actually allowed
     for (uint8_t i = 0; i < VTX_MAX_POWER_LEVELS; i++) {
-        if (_power_mw == _power_levels[i].mw
-            && _power_levels[i].active != PowerActive::Inactive) {
+        if (_power_mw == _model->getPowerLevels()[i].mw
+            && _model->getPowerLevels()[i].active != PowerActive::Inactive) {
             return true;
         }
     }
@@ -548,7 +491,7 @@ void AP_VideoTX::change_power(uint8_t position)
         return;
     }
 
-    uint16_t requested_power = _power_levels[position].mw.get();
+    uint16_t requested_power = _model->getPowerLevels()[position].mw;
     GCS_SEND_TEXT(MAV_SEVERITY_INFO, "VTX: Setting power to: %dmW at position: %d", requested_power, position);
 
     if (requested_power == 0) {

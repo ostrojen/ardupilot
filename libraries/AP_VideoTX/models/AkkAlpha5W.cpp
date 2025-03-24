@@ -1,5 +1,13 @@
 #include "AkkAlpha5W.h"
 
+PowerLevel AkkAlpha5W::power_levels[VTX_MAX_POWER_LEVELS] = {
+    { 0,    25,   14, 7    },
+    { 1,    1000, 30, 22   },
+    { 2,    2000, 33, 25   },
+    { 3,    3000, 35, 32   },
+    { 4,    5000, 37, 40   },
+};
+
 const char* AkkAlpha5W::band_names[VTX_MODEL_BANDS] =  {"A","b","E","F","r","P","L","U","O","X"};
 
 const uint16_t AkkAlpha5W::VIDEO_CHANNELS[VTX_MODEL_BANDS][VTX_MODEL_CHANNELS] = {

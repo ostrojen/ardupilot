@@ -22,7 +22,6 @@
 #include "models/VTX_Model.h"
 
 #define FREQUENCY_BUTTON_NUMBER 6
-#define VTX_MAX_POWER_LEVELS 5
 
 class AP_VideoTX {
 public:
@@ -64,27 +63,11 @@ public:
         BAND_X
     };
 
-    enum class PowerActive {
-        Unknown,
-        Active,
-        Inactive
-    };
-
     enum VTXType {
         CRSF = 1U<<0,
         SmartAudio = 1U<<1,
         Tramp = 1U<<2
     };
-
-    struct PowerLevel {
-        AP_Int8 level;
-        AP_Int16 mw;
-        AP_Int8 dbm;
-        AP_Int8 dac; // SmartAudio v1 dac value
-        PowerActive active;
-    };
-
-    PowerLevel _power_levels[VTX_MAX_POWER_LEVELS];
 
     uint16_t get_table_frequency_mhz(uint8_t band, uint8_t channel);
     bool get_band_and_channel(uint16_t freq, VideoBand& band, uint8_t& channel);
@@ -105,19 +88,19 @@ public:
     void update_all_power_dbm(uint8_t nlevels, const uint8_t levels[]);
     void set_configured_power_mw(uint16_t power);
     uint16_t get_configured_power_mw() const { return _power_mw; }
-    uint16_t get_power_mw() const { return _power_levels[_current_power].mw.get(); }
+    uint16_t get_power_mw() const { return _model->getPowerLevels()[_current_power].mw; }
 
     // get the power in dbm, rounding appropriately
     uint8_t get_configured_power_dbm() const {
-        return _power_levels[find_current_power()].dbm.get();
+        return _model->getPowerLevels()[find_current_power()].dbm;
     }
     // get the power "level"
     uint8_t get_configured_power_level() const {
-        return _power_levels[find_current_power()].level.get();
+        return _model->getPowerLevels()[find_current_power()].level;
     }
     // get the power "dac"
     uint8_t get_configured_power_dac() const {
-        return _power_levels[find_current_power()].dac.get();
+        return _model->getPowerLevels()[find_current_power()].dac;
     }
 
     bool update_power() const;

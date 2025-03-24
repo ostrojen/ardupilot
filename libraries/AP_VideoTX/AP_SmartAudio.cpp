@@ -518,7 +518,7 @@ void AP_SmartAudio::update_vtx_settings(const Settings& settings)
         // learn them all
         vtx.update_all_power_dbm(settings.num_power_levels, settings.power_levels);
     } else {
-        vtx.set_power_level(settings.power, AP_VideoTX::PowerActive::Active);
+        vtx.set_power_level(settings.power, PowerActive::Active);
     }
     // it seems like the spec is wrong, on a unify pro32 this setting is inverted
     _vtx_use_set_freq = !(settings.mode & 1);
@@ -606,21 +606,21 @@ bool  AP_SmartAudio::parse_response_buffer(const uint8_t *buffer)
         switch (_protocol_version) {
         case SMARTAUDIO_SPEC_PROTOCOL_v21:
             if (vtx.get_configured_power_dbm() != power) {
-                vtx.update_power_dbm(vtx.get_configured_power_dbm(), AP_VideoTX::PowerActive::Inactive);
+                vtx.update_power_dbm(vtx.get_configured_power_dbm(), PowerActive::Inactive);
             }
             vtx.set_power_dbm(power);
             vtx.set_configured_power_mw(vtx.get_power_mw());
             break;
         case SMARTAUDIO_SPEC_PROTOCOL_v2:
             if (vtx.get_configured_power_level() != power) {
-                vtx.update_power_dbm(vtx.get_configured_power_dbm(), AP_VideoTX::PowerActive::Inactive);
+                vtx.update_power_dbm(vtx.get_configured_power_dbm(), PowerActive::Inactive);
             }
             vtx.set_power_level(power);
             vtx.set_configured_power_mw(vtx.get_power_mw());
             break;
         case SMARTAUDIO_SPEC_PROTOCOL_v1:
             if (vtx.get_configured_power_dac() != power) {
-                vtx.update_power_dbm(vtx.get_configured_power_dbm(), AP_VideoTX::PowerActive::Inactive);
+                vtx.update_power_dbm(vtx.get_configured_power_dbm(), PowerActive::Inactive);
             }
             vtx.set_power_dac(power);
             vtx.set_configured_power_mw(vtx.get_power_mw());

@@ -1,6 +1,15 @@
 #include "AkkUltraLongRange3WLX.h"
 
-const char* AkkUltraLongRange3WLX::band_names[VTX_MODEL_BANDS] =  {"A","B","E","F","L","X"};
+//TODO dac and dbm values
+PowerLevel AkkUltraLongRange3WLX::power_levels[VTX_MAX_POWER_LEVELS] = {
+    { 1,    250,  14, 7    },
+    { 2,    500,  27, 25   },
+    { 3,    1000, 27, 25   },
+    { 4,    2000, 27, 25   },
+    { 5,    3000, 34, 40   },
+};
+
+const char* AkkUltraLongRange3WLX::band_names[VTX_MODEL_BANDS] = {"A","B","E","F","L","X"};
 
 const uint16_t AkkUltraLongRange3WLX::VIDEO_CHANNELS[VTX_MODEL_BANDS][VTX_MODEL_CHANNELS] = {
     /* Band A */{ 5865, 5845, 5825, 5805, 5785, 5765, 5745, 5725},
