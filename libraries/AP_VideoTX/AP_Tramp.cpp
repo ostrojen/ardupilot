@@ -120,7 +120,7 @@ char AP_Tramp::handle_response(void)
             bool update_pending = vtx.have_params_changed();
             vtx.set_frequency_mhz(freq);
 
-            AP_VideoTX::VideoBand band;
+            uint8_t band;
             uint8_t channel;
             if (vtx.get_band_and_channel(freq, band, channel)) {
                 vtx.set_band(band);

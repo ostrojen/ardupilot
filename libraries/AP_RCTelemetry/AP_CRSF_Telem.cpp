@@ -542,12 +542,12 @@ bool AP_CRSF_Telem::_process_frame(AP_RCProtocol_CRSF::FrameType frame_type, voi
 #if AP_VIDEOTX_ENABLED
 void AP_CRSF_Telem::process_vtx_frame(VTXFrame* vtx) {
     vtx->user_frequency = be16toh(vtx->user_frequency);
+    AP_VideoTX& apvtx = AP::vtx();
 
     debug("VTX: SmartAudio: %d, Avail: %d, FreqMode: %d, Band: %d, Channel: %d, Freq: %d, PitMode: %d, Pwr: %d, Pit: %d",
         vtx->smart_audio_ver, vtx->is_vtx_available, vtx->is_in_user_frequency_mode,
-        vtx->band, vtx->channel, vtx->is_in_user_frequency_mode ? vtx->user_frequency : AP_VideoTX::get_frequency_mhz(vtx->band, vtx->channel),
+        vtx->band, vtx->channel, vtx->is_in_user_frequency_mode ? vtx->user_frequency : apvtx.get_table_frequency_mhz(vtx->band, vtx->channel),
         vtx->is_in_pitmode, vtx->power, vtx->pitmode);
-    AP_VideoTX& apvtx = AP::vtx();
 
     // the user may have a VTX connected but not want AP to control it
     // (for instance because they are using myVTX on the transmitter)
@@ -562,7 +562,7 @@ void AP_CRSF_Telem::process_vtx_frame(VTXFrame* vtx) {
     if (vtx->is_in_user_frequency_mode) {
         apvtx.set_frequency_mhz(vtx->user_frequency);
     } else {
-        apvtx.set_frequency_mhz(AP_VideoTX::get_frequency_mhz(vtx->band, vtx->channel));
+        apvtx.set_frequency_mhz(apvtx.get_table_frequency_mhz(vtx->band, vtx->channel));
     }
     // 14dBm (25mW), 20dBm (100mW), 26dBm (400mW), 29dBm (800mW)
     switch (vtx->power) {
@@ -607,10 +607,10 @@ void AP_CRSF_Telem::process_vtx_telem_frame(VTXTelemetryFrame* vtx)
 
     apvtx.set_frequency_mhz(vtx->frequency);
 
-    AP_VideoTX::VideoBand band;
+    uint8_t band;
     uint8_t channel;
-    if (AP_VideoTX::get_band_and_channel(vtx->frequency, band, channel)) {
-        apvtx.set_band(uint8_t(band));
+    if (apvtx.get_band_and_channel(vtx->frequency, band, channel)) {
+        apvtx.set_band(band);
         apvtx.set_channel(channel);
     }
 
