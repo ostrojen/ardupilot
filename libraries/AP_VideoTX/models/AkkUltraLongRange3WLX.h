@@ -8,6 +8,10 @@ public:
     static const char* band_names[VTX_MODEL_BANDS];
     static const uint16_t VIDEO_CHANNELS[VTX_MODEL_BANDS][VTX_MODEL_CHANNELS];
 
+    const char* getName() const override {
+      return "AkkUltraLongRange3WLX";
+    }
+
     PowerLevel (&getPowerLevels() override)[VTX_MAX_POWER_LEVELS] {
         return power_levels;
     }

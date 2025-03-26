@@ -112,7 +112,7 @@ AP_VideoTX::AP_VideoTX()
 
     AP_Param::setup_object_defaults(this, var_info);
 
-    _model = Factory::by_model_id_param(_model_id);
+    _model = Factory::default_model();
 }
 
 AP_VideoTX::~AP_VideoTX(void)
@@ -419,6 +419,8 @@ bool AP_VideoTX::set_defaults()
         return false;
     }
 
+    _model = Factory::by_model_id_param(_model_id);
+
     // check that our current view of frequency matches band/channel
     // if not then force one to be correct
     uint16_t calced_freq = get_table_frequency_mhz(_current_band, _current_channel);
@@ -474,7 +476,8 @@ void AP_VideoTX::announce_vtx_settings() const
     // Output a friendly message so the user knows the VTX has been detected
     GCS_SEND_TEXT(
         MAV_SEVERITY_INFO,
-        "VTX: %s%d %dMHz, PWR: %dmW",
+        "%s: %s%d %dMHz, PWR: %dmW",
+        _model->getName(),
         _model->getBandNames()[_band.get()],
         _channel.get() + 1,
         _frequency_mhz.get(),

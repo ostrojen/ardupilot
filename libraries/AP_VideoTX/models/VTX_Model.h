@@ -23,6 +23,7 @@ class VTX_Model {
 public:
     virtual ~VTX_Model() = default;
 
+    virtual const char* getName() const;
     virtual PowerLevel (&getPowerLevels())[VTX_MAX_POWER_LEVELS];
     virtual uint16_t getMaxPower() const;
     virtual const char* (&getBandNames() const)[VTX_MODEL_BANDS];

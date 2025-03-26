@@ -8,6 +8,10 @@ public:
     static const uint16_t VIDEO_CHANNELS[VTX_MODEL_BANDS][VTX_MODEL_CHANNELS];
     static const uint16_t max_power;
 
+    const char* getName() const override {
+      return "AkkAlpha5W";
+    }
+
     PowerLevel (&getPowerLevels() override)[VTX_MAX_POWER_LEVELS] {
         return power_levels;
     }
