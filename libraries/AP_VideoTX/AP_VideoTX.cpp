@@ -83,11 +83,6 @@ const AP_Param::GroupInfo AP_VideoTX::var_info[] = {
     AP_GROUPINFO("BUTTON_5", 12, AP_VideoTX, _frequency_buttons[4], 5845),
     AP_GROUPINFO("BUTTON_6", 13, AP_VideoTX, _frequency_buttons[5], 5800),
 
-    // @Param: MODEL
-    // @DisplayName: Video Transmitter Model
-    // @Description: Video Transmitter Model
-    // @User: Advanced
-    // @Values: 0:AKK Ranger 3W,1:AKK Ranger 3W LX,2:AKK Ranger 3W LX,3:AKK Alpha 5W
     AP_GROUPINFO("MODEL_ID", 14, AP_VideoTX, _model_id, 3),
 
     AP_GROUPEND
@@ -419,6 +414,7 @@ bool AP_VideoTX::set_defaults()
         return false;
     }
 
+    GCS_SEND_TEXT(MAV_SEVERITY_INFO, "VTX: Model ID %d", _model_id.get());
     _model = Factory::by_model_id_param(_model_id);
 
     // check that our current view of frequency matches band/channel
