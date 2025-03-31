@@ -58,17 +58,11 @@ void ModeCruise::navigate()
         return;
     }
 #endif
-
-    // check if we are moving in the direction of the front of the vehicle
-    const int32_t ground_course_cd = plane.gps.ground_course_cd();
-    const bool moving_forwards = fabsf(wrap_PI(radians(ground_course_cd * 0.01) - plane.ahrs.get_yaw())) < M_PI_2;
-
     if (!locked_heading &&
         plane.channel_roll->get_control_in() == 0 &&
-        plane.rudder_input() == 0 &&
+        plane.channel_rudder->get_control_in()== 0/* &&
         plane.gps.status() >= AP_GPS::GPS_OK_FIX_2D &&
-        plane.gps.ground_speed() >= 3 &&
-        moving_forwards &&
+        plane.gps.ground_speed() >= 3*/ &&
         lock_timer_ms == 0) {
         // user wants to lock the heading - start the timer
         lock_timer_ms = millis();
@@ -79,14 +73,15 @@ void ModeCruise::navigate()
         // from user
         locked_heading = true;
         lock_timer_ms = 0;
-        locked_heading_cd = ground_course_cd;
+        locked_heading_cd = /*plane.gps.ground_course_cd();//*/ahrs.yaw_sensor;
         plane.prev_WP_loc = plane.current_loc;
     }
     if (locked_heading) {
         plane.next_WP_loc = plane.prev_WP_loc;
         // always look 1km ahead
-        plane.next_WP_loc.offset_bearing(locked_heading_cd*0.01f, plane.prev_WP_loc.get_distance(plane.current_loc) + 1000);
-        plane.nav_controller->update_waypoint(plane.prev_WP_loc, plane.next_WP_loc);
+        //plane.next_WP_loc.offset_bearing(locked_heading_cd*0.01f, plane.prev_WP_loc.get_distance(plane.current_loc) + 1000);
+        //plane.nav_controller->update_waypoint(plane.prev_WP_loc, plane.next_WP_loc);
+        plane.nav_controller->update_heading_hold(locked_heading_cd);
     }
 }
 
