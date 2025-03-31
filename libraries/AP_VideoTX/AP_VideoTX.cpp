@@ -139,14 +139,21 @@ bool AP_VideoTX::init(void)
 }
 
 uint16_t AP_VideoTX::get_table_frequency_mhz(uint8_t band, uint8_t channel) {
-    return _model->getVideoChannels()[band][channel];
+    uint16_t freq = _model->getVideoChannels()[band][channel];
+    debug("get_table_frequency_mhz (band: %d, channel: %d, freq: %d)", band, channel, freq);
+    return freq;
 }
 
 bool AP_VideoTX::get_band_and_channel(uint16_t freq, VideoBand& band, uint8_t& channel)
 {
+    if (freq == 0) {// TODO make it nice
+        return false;
+    }
+
     for (uint8_t i = 0; i < VTX_MODEL_BANDS; i++) {
         for (uint8_t j = 0; j < VTX_MODEL_CHANNELS; j++) {
             if (_model->getVideoChannels()[i][j] == freq) {
+                debug("get_band_and_channel (freq: %d, band: %d, channel %d)", freq, i, j);
                 band = VideoBand(i);
                 channel = j;
                 return true;
@@ -391,7 +398,9 @@ bool AP_VideoTX::have_params_changed() const
 // update the configured frequency to match the channel and band
 void AP_VideoTX::update_configured_frequency()
 {
-    _frequency_mhz.set_and_save(get_table_frequency_mhz(_band, _channel));
+    uint16_t freq = get_table_frequency_mhz(_band, _channel);
+    debug("update_configured_frequency (band: %d, channel: %d, freq: %d)", _band.get(), _channel.get(), freq);
+    _frequency_mhz.set_and_save(freq);
 }
 
 // update the configured channel and band to match the frequency

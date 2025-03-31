@@ -2,6 +2,7 @@
 
 //TODO dac and dbm values
 PowerLevel UltraLongRange3WLX::power_levels[VTX_MAX_POWER_LEVELS] = {
+//  { 0,    25,   7,  7    },
     { 1,    250,  14, 7    },
     { 2,    500,  27, 25   },
     { 3,    1000, 27, 25   },
@@ -17,7 +18,7 @@ const uint16_t UltraLongRange3WLX::VIDEO_CHANNELS[VTX_MODEL_BANDS][VTX_MODEL_CHA
     /* Band E */{ 5705, 5685, 5665, 5645, 5885, 5905, 5925, 5945},
     /* Band F */{ 5740, 5760, 5780, 5800, 5820, 5840, 5860, 5880},
     /* Band L */{ 5362, 5399, 5436, 5473, 5510, 5547, 5584, 5621},
-    /* Band X */{ 4990, 5020, 5050, 5080, 5110, 5140, 5170, 5200},
+    /* Band X   { 4990, 5020, 5050, 5080, 5110, 5140, 5170, 5200}, doesn't work via smartaudio */
 };
 
 const uint16_t UltraLongRange3WLX::max_power = 3000;
