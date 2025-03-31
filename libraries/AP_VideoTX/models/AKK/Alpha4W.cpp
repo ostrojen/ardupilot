@@ -1,16 +1,16 @@
-#include "AkkAlpha5W.h"
+#include "Alpha4W.h"
 
-PowerLevel AkkAlpha5W::power_levels[VTX_MAX_POWER_LEVELS] = {
+PowerLevel Alpha4W::power_levels[VTX_MAX_POWER_LEVELS] = {
     { 0,    25,   14, 7    },
     { 1,    1000, 30, 22   },
     { 2,    2000, 33, 25   },
     { 3,    3000, 35, 32   },
-    { 4,    5000, 37, 40   },
+    { 4,    4000, 37, 40   },
 };
 
-const char* AkkAlpha5W::band_names[VTX_MODEL_BANDS] =  {"A","b","E","F","r","P","L","U","O","X"};
+const char* Alpha4W::band_names[VTX_MODEL_BANDS] =  {"A","b","E","F","r","P","L","U","O","X"};
 
-const uint16_t AkkAlpha5W::VIDEO_CHANNELS[VTX_MODEL_BANDS][VTX_MODEL_CHANNELS] = {
+const uint16_t Alpha4W::VIDEO_CHANNELS[VTX_MODEL_BANDS][VTX_MODEL_CHANNELS] = {
     /* Band A */{ 5865, 5845, 5825, 5805, 5785, 5765, 5745, 5725},
     /* Band b */{ 5733, 5752, 5771, 5790, 5809, 5828, 5847, 5866},
     /* Band E */{ 5705, 5685, 5665, 5645, 5885, 5905, 5925, 5945},
@@ -22,4 +22,5 @@ const uint16_t AkkAlpha5W::VIDEO_CHANNELS[VTX_MODEL_BANDS][VTX_MODEL_CHANNELS] =
     /* Band O */{ 5474, 5492, 5510, 5528, 5546, 5564, 5582, 5600},
     /* Band X */{ 4990, 5020, 5050, 5080, 5110, 5140, 5170, 5200},
 };
-const uint16_t AkkAlpha5W::max_power = 5000;
+
+const uint16_t Alpha4W::max_power = 4000;

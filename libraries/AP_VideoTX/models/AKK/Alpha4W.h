@@ -1,15 +1,16 @@
 #pragma once
-#include "VTX_Model.h"
 
-class AkkUltraLongRange3WLX : public VTX_Model {
+#include <AP_VideoTX/models/VTX_Model.h>
+
+class Alpha4W : public VTX_Model {
 public:
     static PowerLevel power_levels[VTX_MAX_POWER_LEVELS];
-    static const uint16_t max_power;
     static const char* band_names[VTX_MODEL_BANDS];
     static const uint16_t VIDEO_CHANNELS[VTX_MODEL_BANDS][VTX_MODEL_CHANNELS];
+    static const uint16_t max_power;
 
     const char* getName() const override {
-      return "AkkUltraLongRange3WLX";
+      return "AKK Alpha 4W";
     }
 
     PowerLevel (&getPowerLevels() override)[VTX_MAX_POWER_LEVELS] {

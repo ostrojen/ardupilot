@@ -19,6 +19,7 @@
 
 #include <AP_RCTelemetry/AP_CRSF_Telem.h>
 #include <GCS_MAVLink/GCS.h>
+#include <map>
 
 #include <AP_HAL/AP_HAL.h>
 #include "models/Factory.cpp"
@@ -415,7 +416,9 @@ bool AP_VideoTX::set_defaults()
     }
 
     GCS_SEND_TEXT(MAV_SEVERITY_INFO, "VTX: Model ID %d", _model_id.get());
-    _model = Factory::by_model_id_param(_model_id);
+    _model = Factory::by_model_id_param(_model_id.get());
+
+    check_frequency_buttons();
 
     // check that our current view of frequency matches band/channel
     // if not then force one to be correct
@@ -465,6 +468,33 @@ bool AP_VideoTX::set_defaults()
     announce_vtx_settings();
 
     return true;
+}
+
+void AP_VideoTX::check_frequency_buttons() const
+{
+	std::map<int, bool> result;
+
+	for (uint8_t button = 0; button < FREQUENCY_BUTTON_NUMBER; button++) {
+		result[button] = false;
+		uint16_t frequency = get_button_frequency(button);
+		for (uint8_t band = 0; band < VTX_MODEL_BANDS && result[button] == false; band++) {
+        	for (uint8_t channel = 0; channel < VTX_MODEL_CHANNELS && result[button] == false; channel++) {
+            	if (_model->getVideoChannels()[band][channel] == frequency) {
+					result[button] = true;
+            	}
+        	}
+    	}
+
+        if (result[button] == false) {
+        	GCS_SEND_TEXT(
+        		MAV_SEVERITY_INFO,
+        		"VTX button %d frequency %d not found in vtx '%s' frequency table",
+              	button,
+                frequency,
+        		_model->getName()
+    		);
+        }
+    }
 }
 
 void AP_VideoTX::announce_vtx_settings() const

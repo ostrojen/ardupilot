@@ -1,7 +1,8 @@
 #pragma once
-#include "VTX_Model.h"
 
-class AkkAlpha5W : public VTX_Model {
+#include <AP_VideoTX/models/VTX_Model.h>
+
+class Alpha5W : public VTX_Model {
 public:
     static PowerLevel power_levels[VTX_MAX_POWER_LEVELS];
     static const char* band_names[VTX_MODEL_BANDS];
@@ -9,7 +10,7 @@ public:
     static const uint16_t max_power;
 
     const char* getName() const override {
-      return "AkkAlpha5W";
+      return "AKK Alpha 5W";
     }
 
     PowerLevel (&getPowerLevels() override)[VTX_MAX_POWER_LEVELS] {
