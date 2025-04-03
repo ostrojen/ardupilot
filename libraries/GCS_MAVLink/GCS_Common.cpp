@@ -2028,9 +2028,9 @@ void GCS_MAVLINK::send_rc_channels_raw() const
 {
     // for mavlink1 send RC_CHANNELS_RAW, for compatibility with OSD
     // implementations
-    if (!sending_mavlink1()) {
-        return;
-    }
+    // if (!sending_mavlink1()) {
+    //     return;
+    // }
 
     uint16_t values[8] = {};
     rc().get_radio_in(values, ARRAY_SIZE(values));
@@ -2039,10 +2039,10 @@ void GCS_MAVLINK::send_rc_channels_raw() const
         chan,
         AP_HAL::millis(),
         0,
-        values[0],
-        values[1],
-        values[2],
-        values[3],
+        hal.rcin->read(0),
+        hal.rcin->read(1),
+        hal.rcin->read(2),
+        hal.rcin->read(3),
         values[4],
         values[5],
         values[6],
