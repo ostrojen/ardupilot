@@ -5,12 +5,14 @@
 #include <AP_VideoTX/models/AKK/UltraLongRange3W.cpp>
 #include <AP_VideoTX/models/AKK/UltraLongRange3WLX.cpp>
 #include <AP_VideoTX/models/AKK/UltraLongRange3WAll.cpp>
+#include <AP_VideoTX/models/RUSHFPV/MaxSolo.cpp>
 
 class Factory {
 public:
   static VTX_Model *by_model_id_param(uint8_t model_id)
   {
     switch(model_id) {
+      case 0: return new MaxSolo();
       case 1: return new UltraLongRange3WAll();
       case 2: return new UltraLongRange3WLX();
       case 3: return new UltraLongRange3W();
