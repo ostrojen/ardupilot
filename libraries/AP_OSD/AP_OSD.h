@@ -263,6 +263,7 @@ private:
     AP_Int8 esc_index;
 #endif
 
+    uint8_t countCharacters(uint16_t number); // ostro
     void draw_plane_name(); // Finchi
     void draw_iboard_state(); // Finchi
     void draw_altitude(uint8_t x, uint8_t y);
@@ -562,6 +563,7 @@ public:
     AP_Int8 v_offset;
     AP_Int8 h_offset;
 
+    AP_Int16 ostro_plane_number; // ostro
     AP_Int8 finchi_plane_name_choice; // Finchi
     AP_Int8 finchi_plane_name_x; // Finchi
     AP_Int8 finchi_plane_name_y; // Finchi

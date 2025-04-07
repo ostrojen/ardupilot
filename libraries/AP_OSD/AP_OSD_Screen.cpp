@@ -1519,11 +1519,24 @@ void AP_OSD_Screen::draw_avgcellrestvolt(uint8_t x, uint8_t y)
 {
     draw_bat_volt(0,VoltageType::RESTING_CELL,x, y);
 }
+
+uint8_t AP_OSD_Screen::countCharacters(uint16_t number) {
+    int count = 0;
+
+    while (number > 0) {
+        number /= 10;
+        count++;
+    }
+
+    return count;
+}
+
 // Finchi
 void AP_OSD_Screen::draw_plane_name()
 {
     // Pointer to a constant string
     const char* aircraft_name;
+    const uint16_t aircraft_number = osd->ostro_plane_number.get();
 
     // Determine the plane name based on choice
     switch (osd->finchi_plane_name_choice)
@@ -1542,8 +1555,25 @@ void AP_OSD_Screen::draw_plane_name()
         break;
     }
 
-    // Display the string on the screen using backend's write function
-    backend->write(osd->finchi_plane_name_x, osd->finchi_plane_name_y, false, "%s", aircraft_name);
+    if(aircraft_number == 0) {
+        backend->write(
+            osd->finchi_plane_name_x,
+            osd->finchi_plane_name_y,
+            false,
+            "%s",
+            aircraft_name
+        );
+    } else {
+        // Display the string on the screen using backend's write function
+        backend->write(
+            osd->finchi_plane_name_x - countCharacters(aircraft_number),
+            osd->finchi_plane_name_y,
+            false,
+            "%s %d",
+            aircraft_name,
+            aircraft_number
+        );
+    }
 }
 
 // Finchi
