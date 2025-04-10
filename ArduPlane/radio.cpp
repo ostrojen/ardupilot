@@ -345,16 +345,16 @@ void Plane::trim_radio()
 
     // trim main surfaces
     SRV_Channels::set_trim_to_servo_out_for(SRV_Channel::k_aileron);
-    SRV_Channels::set_trim_to_servo_out_for(SRV_Channel::k_elevator);
-    SRV_Channels::set_trim_to_servo_out_for(SRV_Channel::k_rudder);
+    //SRV_Channels::set_trim_to_servo_out_for(SRV_Channel::k_elevator);
+    //SRV_Channels::set_trim_to_servo_out_for(SRV_Channel::k_rudder);
 
     // trim elevons
-    SRV_Channels::set_trim_to_servo_out_for(SRV_Channel::k_elevon_left);
-    SRV_Channels::set_trim_to_servo_out_for(SRV_Channel::k_elevon_right);
+    //SRV_Channels::set_trim_to_servo_out_for(SRV_Channel::k_elevon_left);
+    //SRV_Channels::set_trim_to_servo_out_for(SRV_Channel::k_elevon_right);
 
     // trim vtail
-    SRV_Channels::set_trim_to_servo_out_for(SRV_Channel::k_vtail_left);
-    SRV_Channels::set_trim_to_servo_out_for(SRV_Channel::k_vtail_right);
+    //SRV_Channels::set_trim_to_servo_out_for(SRV_Channel::k_vtail_left);
+    //SRV_Channels::set_trim_to_servo_out_for(SRV_Channel::k_vtail_right);
     
     if (is_zero(SRV_Channels::get_output_scaled(SRV_Channel::k_rudder))) {
         // trim differential spoilers if no rudder input
@@ -373,8 +373,8 @@ void Plane::trim_radio()
 
     // now save input trims, as these have been moved to the outputs
     channel_roll->set_and_save_trim();
-    channel_pitch->set_and_save_trim();
-    channel_rudder->set_and_save_trim();
+    //channel_pitch->set_and_save_trim();
+    //channel_rudder->set_and_save_trim();
 
     gcs().send_text(MAV_SEVERITY_NOTICE, "trim complete");
 }
